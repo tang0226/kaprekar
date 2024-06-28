@@ -1,3 +1,5 @@
+const CHAR = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -9,6 +11,33 @@ function setCanvasDim(w, h) {
 }
 
 setCanvasDim(1000, 1000);
+
+function str(arr) {
+  let str = "";
+  for (let i = arr.length - 1; i > -1; i--) {
+    str += CHAR.charAt(arr[i]);
+  }
+  return str;
+}
+
+function toArr(n, pad, b = 10) {
+  let arr = [];
+  let e = Math.floor(Math.log(n) / Math.log(b));
+  let p = b ** e;
+  let x = n;
+  while (e >= 0) {
+    let d = Math.floor(x / p);
+    arr.push(d);
+    x -= p * d;
+    e--;
+    p /= b;
+  }
+  arr.reverse();
+  while (arr.length < pad) {
+    arr.push(0);
+  }
+  return arr;
+}
 
 function sub(n1, n2, b = 10) {
   let r = [];
@@ -42,7 +71,58 @@ function allSame(arr) {
   return true;
 }
 
-const kConst = [4, 7, 1, 6];
+var base = 10;
+
+
+var squareSize = 1;
+
+var e1 = 3, e2 = 2;
+var baseLength = base ** e1;
+var height = base ** e2;
+var digs = e1 + e2;
+
+setCanvasDim(squareSize * baseLength, squareSize * height);
+
+
+var results = [];
+var n = 0;
+
+for (var x = 0; x < baseLength; x++) {
+  for (var y = 0; y < height; y++) {
+    let start = toArr(n, digs, base);
+    let curr = [...start];
+    if (allSame(curr)) {
+      n++;
+      continue;
+    }
+    let i = 0;
+    let strings = [str(start)];
+    let period;
+    let cycle;
+    let done = false;
+
+    while (!done) {
+      i++;
+
+      let desc = [...curr].sort(function(a, b) {
+        return a - b;
+      });
+
+      curr = sub(desc, [...desc].reverse(), base);
+      let s = str(curr);
+      if (strings.includes(s)) {
+        period = i - strings.indexOf(s);
+        cycle = strings.slice(-period);
+        done = true;
+      }
+      strings.push(s);
+    }
+    results.push([strings, cycle, period]);
+    n++;
+  }
+}
+
+/**const kConst = [4, 7, 1, 6];
 
 var results = [];
 
@@ -78,3 +158,4 @@ for (let i = 0; i < 10000; i++) {
   ctx.fillStyle = `rgb(${bw}, ${bw}, ${bw})`;
   ctx.fillRect(x * 10, 1000 - y * 10, 10, 10);
 }
+*/
