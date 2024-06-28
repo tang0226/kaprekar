@@ -1,48 +1,59 @@
-const CHAR = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
 const progress = document.getElementById("progress");
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+
+var width = canvas.width;
+var height = canvas.height;
 
 function setCanvasDim(w, h) {
   canvas.width = w;
   canvas.height = h;
   canvas.style.width = w + "px";
   canvas.style.height = h + "px";
+  width = w;
+  height = h;
 }
 
-setCanvasDim(1000, 1000);
 
-var base = 10;
+var base = 6;
 
+var squareSize = 6;
 
-var squareSize = 1;
-
-var e1 = 2, e2 = 3;
+var e1 = 3, e2 = 3;
 var baseLength = base ** e1;
-var height = base ** e2;
+var diagramHeight = base ** e2;
+var upper = baseLength * diagramHeight;
 var digs = e1 + e2;
 
-setCanvasDim(squareSize * baseLength, squareSize * height);
+var itersOnly = true;
+
+setCanvasDim(squareSize * baseLength, squareSize * diagramHeight);
+
+var data = [];
 
 
-var worker = new Worker("./worker.js");
+var calcWorker = new Worker("./worker.js");
 
-worker.onmessage = function(e) {
-  let data = e.data;
-  if (data.msg == "progress") {
-    progress.value = data.progress;
+calcWorker.onmessage = function(e) {
+  let d = e.data;
+  if (d.msg == "progress") {
+    progress.value = d.progress;
   }
-  if (data.msg == "done") {
+  if (d.msg == "done") {
     progress.value = 1;
-    console.log(data.results);
+    ctx.putImageData(d.imgData, 0, 0, 0, 0, width, height);
   }
 }
 
-worker.postMessage({
+
+calcWorker.postMessage({
   msg: "calculate",
   base: base,
   digs: digs,
   interval: baseLength,
+  baseLength: baseLength,
+  diagramHeight: diagramHeight,
+  squareSize: squareSize,
+  itersOnly: itersOnly,
 });
