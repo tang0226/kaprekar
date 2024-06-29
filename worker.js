@@ -105,12 +105,8 @@ onmessage = function(e) {
         strings.push(s);
       }
 
-      if (data.itersOnly) {
-        results[n] = strings.length - period;
-      }
-      else {
-        results[n] = [strings, cycle, period];
-      }
+      results[n] = data.itersOnly ? 
+        strings.length - period : [strings, cycle, period];
 
       if (n % interval == 0) {
         this.postMessage({
