@@ -26,45 +26,52 @@ var itersOnly = true;
 var data = [];
 
 var calcWorker;
+var rendering = false;
 
 renderButton.addEventListener("click", function() {
-  calcWorker = new Worker("./worker.js");
+  if (!rendering) {
+    calcWorker = new Worker("./worker.js");
 
-  calcWorker.onmessage = function(e) {
-    let d = e.data;
-    if (d.msg == "progress") {
-      progress.value = d.progress;
+    calcWorker.onmessage = function(e) {
+      let d = e.data;
+      if (d.msg == "progress") {
+        progress.value = d.progress;
+      }
+      if (d.msg == "done") {
+        progress.value = 1;
+        ctx.putImageData(d.imgData, 0, 0);
+        rendering = false;
+      }
     }
-    if (d.msg == "done") {
-      progress.value = 1;
-      ctx.putImageData(d.imgData, 0, 0);
-    }
+  
+    let base = Number(baseInput.value);
+    let exponent = Number(exponentInput.value);
+    let baseLength = base ** exponent;
+    let diagramHeight = baseLength;
+    let squareSize = Number(squareSizeInput.value);
+    let itersOnly = true;
+  
+    let canvasSide = base ** exponent * squareSize;
+    setCanvasDim(canvasSide, canvasSide);
+  
+    calcWorker.postMessage({
+      msg: "calculate",
+      base: base,
+      digs: 2 * exponent,
+      interval: baseLength,
+      baseLength: baseLength,
+      diagramHeight: diagramHeight,
+      squareSize: squareSize,
+      itersOnly: itersOnly,
+    });
+
+    rendering = true;
   }
-
-  let base = Number(baseInput.value);
-  let exponent = Number(exponentInput.value);
-  let baseLength = base ** exponent;
-  let diagramHeight = baseLength;
-  let squareSize = Number(squareSizeInput.value);
-  let itersOnly = true;
-
-  let canvasSide = base ** exponent * squareSize;
-  setCanvasDim(canvasSide, canvasSide);
-
-  calcWorker.postMessage({
-    msg: "calculate",
-    base: base,
-    digs: 2 * exponent,
-    interval: baseLength,
-    baseLength: baseLength,
-    diagramHeight: diagramHeight,
-    squareSize: squareSize,
-    itersOnly: itersOnly,
-  });
 });
 
 cancelButton.addEventListener("click", function() {
   calcWorker.terminate();
+  rendering = false;
 });
 
 renderButton.click();
