@@ -67,15 +67,14 @@ onmessage = function(e) {
     let upper = base ** digs;
     let interval = data.interval;
     
-    let results = [];
+    let results = new (data.itersOnly ? Uint8ClampedArray : Array)(upper);
     let maxI = 0;
 
     for (let n = 0; n < upper; n++) {
       let curr = toArr(n, digs, base);
       if (allSame(curr)) {
-        results.push(
+        results[n] =
           data.itersOnly ? 0 : [[str(curr)], [], 0]
-        );
         continue;
       }
 
@@ -107,10 +106,10 @@ onmessage = function(e) {
       }
 
       if (data.itersOnly) {
-        results.push(strings.length - period);
+        results[n] = strings.length - period;
       }
       else {
-        results.push([strings, cycle, period]);
+        results[n] = [strings, cycle, period];
       }
 
       if (n % interval == 0) {
