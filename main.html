@@ -6,6 +6,9 @@
       #canvas {
         border: 1px solid black;
       }
+      .inline {
+        display: inline;
+      }
     </style>
   </head>
   <body>
@@ -14,16 +17,33 @@
     <progress id="progress"></progress>
     <div id="msg"></div>
     <div>
-      Base: <input type="text" id="base" value="10" style="display: inline"/>
-      <br/>
-      Side exponent: <input type="text" id="exponent" value="2" style="display: inline"/>
-      <br/>
-      Square size: <input type="text" id="square-size" value="10" style="display: inline"/>
-      <br/>
+      <div id="diagram-type-container">
+        Diagram mode: 
+        <select id="diagram-mode">
+          <option value="normal">Normal</option>
+          <option value="aliased">Aliased</option>
+        </select>
+      </div>
+      <div id="base-container">
+        Base: <input type="text" id="base" value="10" class="inline"/>
+      </div>
+      <div id="exponent-container">
+        Exponent: <input type="text" id="exponent" value="2" class="inline"/>
+      </div>
+      <div id="square-size-container">
+        Square size: <input type="text" id="square-size" value="10" class="inline"/>
+      </div>
+      <div id="axis-size-container">
+        Axis size: <input type="text" id="axis-size" value="1000" class="inline"/>
+      </div>
+      <div id="canvas-size-container">
+        Canvas size: <input type="text" id="canvas-size" value="1000" class="inline"/>
+      </div>
       <input type="button" id="render" value="Render"/>
       <br/>
       <input type="button" id="cancel" value="Cancel"/>
     </div>
+    <script src="./kaprekar-utils.js"></script>
     <script src="./main.js"></script>
   </body>
 </html>
